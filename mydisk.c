@@ -26,7 +26,7 @@ void createdisk(char *disk_name, int size)
 
   // Write the partition table at disk block 0
   disk->fd = -1;
-  disk->last_block = 0;
+  disk->last_block = -1;
   disk->block_size = BLOCK_SIZE;
   disk->size = size;
 
@@ -182,7 +182,6 @@ int writeblock(disk_t disk, int block, unsigned char *databuf)
   if(block != disk->last_block + 1)
     seekblock(disk, block);
 
-  disk->last_block = block;
   bytes_written = write(disk->fd, databuf, disk->block_size);
 
   if(bytes_written == -1) {
@@ -196,6 +195,8 @@ int writeblock(disk_t disk, int block, unsigned char *databuf)
     perror("writeblock");
     exit(-1);
   }
+
+  disk->last_block = block;
 
   return 0;
 }
