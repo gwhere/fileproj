@@ -1,5 +1,11 @@
-run: sdisk testdisk
-	./testdisk sdisk
+run: sdisk myformat
+	./myformat sdisk
+
+myformat: myformat.o mydisk.o
+	gcc -o myformat myformat.o mydisk.o
+
+myformat.o: myformat.c mydisk.h
+	gcc -c myformat.c
 
 testdisk: testdisk.o mydisk.o
 	gcc -o testdisk testdisk.o mydisk.o
