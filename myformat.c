@@ -1,27 +1,9 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <unistd.h>
-#include "mydisk.h"
+#include "filesys.h"
 
-struct superblock_s
-{
-  int p_size;  // in blocks
-  int bm_loc;
-  int root_loc;
-  int data_loc;
-};
 
-typedef struct superblock_s *superblock;
-
-superblock create_sb(disk_t disk, int size, int bm, int root, int data)
-{
-  superblock sb = malloc(disk->block_size);
-  sb->p_size = size;
-  sb->bm_loc = bm;
-  sb->root_loc = root;
-  sb->data_loc = data;
-  return sb;
-}
 
 void main(int argc, char *argv[])
 {
@@ -33,7 +15,7 @@ void main(int argc, char *argv[])
 
   // Read the parameters
   if(argc != 2) {
-    printf("Usage: testdisk <disk_name>\n");
+    printf("Usage: myformat <disk_name>\n");
     exit(-1);
   }
 
@@ -49,8 +31,9 @@ void main(int argc, char *argv[])
 // Cast sb as char* for read/write so mydisk doesn't complain
 
   // Create a new superblock for testing
-  sb = create_sb(disk, 20, 1, 2, 19);
+  sb = create_sb(disk, 20, 1, 2);
   writeblock(disk, 0, (char *)sb);
+  writeblock(disk, 20, (char *)sb);
   free(sb); 
 
   // Read from the superblock
@@ -58,10 +41,22 @@ void main(int argc, char *argv[])
   readblock(disk, 0, (char *)sb);
 
   // Test superblock
-  printf("sb->p_size = %d\n", sb->p_size);
-  printf("sb->data_loc = %d\n", sb->data_loc);
+  print_sb(sb);
+
+  //Initialize bitmap
+  create_bm(disk, sb);
+
+  //Print bitmap
+  print_bm(disk, sb);
+
+  //DEBUG
+  printf("Next inode space = %d\n", find_inode_space(disk, sb));
+  printf("Next data space = %d\n", find_data_space(disk, sb));
+
+
 /**************************************/
 
+  
   /*
   // Write some blocks
   printf("Writing some blocks...");

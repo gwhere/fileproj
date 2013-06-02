@@ -37,12 +37,15 @@ void createdisk(char *disk_name, int size);
  */
 disk_t opendisk(char *disk_name);
 
+
 /*
  * Seek to a specific block within the file system partition of a disk file
  * Parameters: 
  * - disk_t disk -- the disk 
  * - int block, the block to seek to
  */
+
+
 int seekblock(disk_t disk, int block);
 
 /*
@@ -62,4 +65,6 @@ int readblock(disk_t disk, int block, unsigned char *databuf);
  * - unsigned char *databuf -- a pointer to a block-sized data buffer containing the data to write
  */
 int writeblock(disk_t disk, int block, unsigned char *databuf);
+
+
 
