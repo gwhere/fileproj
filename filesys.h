@@ -35,9 +35,15 @@ void print_sb(superblock sb);
 void create_root(disk_t disk, superblock sb);
 
 /*
- *Initializes bytemap
+ * Prints contents of root node
  */
 
+void print_root(disk_t disk, superblock sb);
+
+/*
+ * Initializes bytemap, which is just an array
+ * of inodes in our filesystem.
+ */
 
 void create_bm(disk_t disk, superblock sb);
 

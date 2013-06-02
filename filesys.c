@@ -19,8 +19,32 @@ void print_sb(superblock sb) {
 }
 
 void create_root(disk_t disk, superblock sb) {
-  short root[sb->p_size / 2];
+  //max # of files supported, up to 2^16 on most systems
+  int max_files = disk->block_size / sizeof(short); 
+  if(max_files > sb->p_size) max_files = sb->p_size;
+  short root[max_files];
+  int i;
+  for(i=0; i<max_files; ++i) {
+    root[i]=-1;
+  }
+  writeblock(disk, sb->root_loc, (char *) root);
 }
+
+void print_root(disk_t disk, superblock sb) {
+  //max # of files supported, up to 2^16 on most systems
+  int max_files = disk->block_size / sizeof(short); 
+  if(max_files > sb->p_size) max_files = sb->p_size;
+  char databuf[disk->block_size];;
+  readblock(disk, sb->root_loc, databuf);
+  int i;
+  printf("Inodes in root directory:\n");
+  for(i=0; i<max_files; ++i) {
+    printf("%d ", databuf[i]);
+  }
+  putchar('\n');
+ 
+}
+
 
 void create_bm(disk_t disk, superblock sb) {
   unsigned char bytemap[disk->block_size];

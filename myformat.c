@@ -43,6 +43,12 @@ void main(int argc, char *argv[])
   // Test superblock
   print_sb(sb);
 
+  //Create root directory
+  create_root(disk, sb);
+
+  //Print root directory
+  print_root(disk, sb);
+
   //Initialize bitmap
   create_bm(disk, sb);
 
