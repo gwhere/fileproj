@@ -1,29 +1,44 @@
 #include "mydisk.h"
 
+#define MAX_F_SIZE 64 //max file size in blocks
+
 /*
  * Struct for superblock
  */
 
 struct superblock_s
 {
-  int p_size;  // in blocks
-  int root_loc;
-  int max_files;
-  int bm_loc;
-  int map_blocks;
-  int data_loc;
+  int p_size;  // size of partition in blocks
+  int root_loc; //location of root directory
+  int max_files; //maximum files that could fit in root dir
+  int bm_loc; //location of bytemap
+  int map_blocks; //blocks the bytemap takes up
+  int data_loc; //location of data/inode block
+
 };
 
 typedef struct superblock_s *superblock;
 
 
+
+
 struct myfile_s {
-  char filename[16];
   int f_size; //in bytes
-  short block_list[64];
+  short block_list[MAX_F_SIZE];
 };
 
 typedef struct myfile_s * myfile;
+
+
+
+struct dir_entry_s {
+  char filename[16];
+  short inode_num;
+};
+
+typedef struct dir_entry_s * dir_entry;
+
+
 /*
  *Create superblock
  */
@@ -62,7 +77,7 @@ void print_root(disk_t disk, superblock sb);
  * Adds an inode number to root dir
  */
 
-void add_to_root(disk_t disk, superblock sb, int inode_num);
+void add_to_root(disk_t disk, superblock sb, char * filename, int inode_num);
 
 
 
@@ -103,8 +118,7 @@ int find_inode_space(disk_t disk, superblock sb, int mark);
  * Pre: filename is 
  */
 
-myfile create_inode(disk_t disk, superblock sb, char * filename, \
-		    int filename_length);
+myfile create_inode(disk_t disk, superblock sb);
 
 
 

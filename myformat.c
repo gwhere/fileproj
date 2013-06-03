@@ -42,11 +42,13 @@ void main(int argc, char *argv[])
   // Test superblock
   print_sb(sb);
 
+
+
   //Create root directory
-  create_root(disk, sb);
+   create_root(disk, sb);
 
   //Print root directory
-  print_root(disk, sb);
+    print_root(disk, sb);
 
   //Initialize bitmap
   create_bm(disk, sb);
@@ -57,9 +59,9 @@ void main(int argc, char *argv[])
   //DEBUG
   printf("Next inode space = %d\n", find_inode_space(disk, sb,0));
   printf("Next data space = %d\n", find_data_space(disk, sb,0));
-  add_to_root(disk, sb, 23);
-  add_to_root(disk, sb, 13);
-  add_to_root(disk, sb, 12);
+  add_to_root(disk, sb, "abc", 23);
+  add_to_root(disk, sb, "def", 13);
+  add_to_root(disk, sb, "thizz", 12);
   
   print_root(disk, sb);
 

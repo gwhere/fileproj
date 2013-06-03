@@ -6,8 +6,8 @@ superblock create_sb(disk_t disk, int size, int root, int bm)
   sb->p_size = size;
 
   sb->root_loc = root;
-  //max # of files supported, up to 2^16 on most systems
-  int max_files = disk->block_size / sizeof(short); 
+  //max # of files
+  int max_files = disk->block_size / sizeof(dir_entry); 
   if(max_files > sb->p_size) max_files = sb->p_size;  
   sb->max_files = max_files;
 
@@ -15,6 +15,7 @@ superblock create_sb(disk_t disk, int size, int root, int bm)
   //Calculate # of blocks needed for bytemap
   sb->map_blocks = ((size -2)/(disk->block_size))+1;
   sb->data_loc = bm + sb->map_blocks;
+
   return sb;
 }
 
@@ -30,12 +31,16 @@ void print_sb(superblock sb) {
 
 void create_root(disk_t disk, superblock sb) {
   
-  short root[sb->max_files];
-  int i;
+  dir_entry root = malloc(sizeof(struct dir_entry_s) * sb->max_files);
+  int i, j;
   for(i=0; i < sb->max_files; ++i) {
-    root[i]=0;
+    //null filename
+    for(j=0; j < 16; j++) root[i].filename[j]='\0';
+    //invalid inode;
+    root[i].inode_num=0;
   }
   writeblock(disk, sb->root_loc, (char *) root);
+  free(root);
 }
 
 
@@ -45,25 +50,25 @@ void print_root(disk_t disk, superblock sb) {
   unsigned char databuf[disk->block_size];
   readblock(disk, sb->root_loc, databuf);
   int i;
+  dir_entry root = (dir_entry) databuf;
   printf("Inodes in root directory:\n");
   for(i=0; i < sb->max_files; ++i) {
-    printf("%d ", databuf[i]);
+    printf("%d: %s\n", root[i].inode_num, root[i].filename);
   }
-  putchar('\n');
 }
 
 
 
-void add_to_root(disk_t disk, superblock sb, int inode_num) {
+void add_to_root(disk_t disk, superblock sb, char * fname, int inode_num) {
     unsigned char databuf[disk->block_size];
     readblock(disk, sb->root_loc, databuf);
-    (short *) databuf;
+    dir_entry root = (dir_entry) databuf;
     int i;
     
     //find free spot to store inode #
     int free_spot=-1;
     for(i=0; i < sb->max_files; ++i) {
-      if(databuf[i] == 0) {
+      if(root[i].inode_num == 0) {
 	free_spot = i;
 	break;
       }
@@ -76,8 +81,15 @@ void add_to_root(disk_t disk, superblock sb, int inode_num) {
 
 
     //Update directory and write to disk.
-    databuf[free_spot] = inode_num;
-    writeblock(disk, sb->root_loc, databuf);
+    root[free_spot].inode_num = inode_num;
+    //Copy null-terminated filename to dir_entry
+    for(i=0; i <16; i++) {
+      if(fname[i]!='\0') {
+	root[free_spot].filename[i] = fname[i];
+      }
+      else break;
+    }
+    writeblock(disk, sb->root_loc, (char *) root);
 }
 
 
@@ -148,25 +160,7 @@ int find_inode_space(disk_t disk, superblock sb, int mark) {
   return -1;
 }
 
-myfile create_inode(disk_t disk, superblock sb, char * name, \
-		    int name_length) {
 
-  if(name_length > 16) {
-    printf("Filename is too long:\n");
-    perror("create_inode");
-  }
-
-  myfile mf = malloc(disk->block_size);
-  int i;
-  for(i=0; i<16; i++) {
-    if(i < name_length) mf->filename[i] = name[i];
-    else mf->filename[i] = '\0';
-  }
-  mf->f_size = 0;
-  for(i=0; i<64; i++) mf->block_list[i] = 0; 
-
-  return mf;
-}
 
 
 int find_data_space(disk_t disk, superblock sb, int mark) {
