@@ -33,7 +33,6 @@ void main(int argc, char *argv[])
   // Create a new superblock for testing
   sb = create_sb(disk, 20, 1, 2);
   writeblock(disk, 0, (char *)sb);
-  writeblock(disk, 20, (char *)sb);
   free(sb); 
 
   // Read from the superblock
@@ -56,68 +55,13 @@ void main(int argc, char *argv[])
   print_bm(disk, sb);
 
   //DEBUG
-  printf("Next inode space = %d\n", find_inode_space(disk, sb));
-  printf("Next data space = %d\n", find_data_space(disk, sb));
-
-
-/**************************************/
-
+  printf("Next inode space = %d\n", find_inode_space(disk, sb,0));
+  printf("Next data space = %d\n", find_data_space(disk, sb,0));
+  add_to_root(disk, sb, 23);
+  add_to_root(disk, sb, 13);
+  add_to_root(disk, sb, 12);
   
-  /*
-  // Write some blocks
-  printf("Writing some blocks...");
-  for(i = 0; i < disk->size; i++) {
+  print_root(disk, sb);
 
-    // Put some data in the block
-    for(j = 0; j < BLOCK_SIZE; j++) 
-      databuf[j] = i;
-
-    printf("%d ", i);
-    writeblock(disk, i, databuf);
-  }
-
-  printf("\nWrote successfully\n");
-
-  // Read some blocks
-  printf("Reading some blocks...");
-  for(i = 0; i < disk->size; i++) {
-    printf("%d ", i);
-    readblock(disk, i, databuf);
-
-    // Check the data in the block
-    for(j = 0; j < BLOCK_SIZE; j++)
-      if(databuf[j] != i) {
-	printf("Main: read data different from written data!\n");
-	exit(-1);
-      }
-  }
-
-  printf("\nRead Successfully and data verified\n");
-
-  // Seek back and read them again
-  printf("Seeking back to block 0\n");
-  seekblock(disk, 0);
-
-  // Read some blocks
-  printf("Reading some blocks...");
-  for(i = 0; i < disk->size; i++) {
-    printf("%d ", i);
-    readblock(disk, i, databuf);
-
-    // Check the data in the block
-    for(j = 0; j < BLOCK_SIZE; j++)
-      if(databuf[j] != i) {
-	printf("Main: read data different from written data!\n");
-	exit(-1);
-      }
-  }
-
-  printf("\nRead Successfully and data verified\n");
-  printf("Done reading and writing.\n");
-
-  // Try seeking past the end of the disk
-  printf("Seeking off the end of the disk\n");
-  seekblock(disk, disk->size);
-  */
 }
 
