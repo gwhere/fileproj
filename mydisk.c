@@ -29,7 +29,6 @@ void createdisk(char *disk_name, int size)
   disk->last_block = -1;
   disk->block_size = BLOCK_SIZE;
   disk->size = size;
-
   bytes_written = write(fd, disk, BLOCK_SIZE);
 
   if(bytes_written == -1) {
@@ -78,6 +77,8 @@ disk_t opendisk(char *disk_name)
 
   return(disk);
 }
+
+
 
 
 // Seeks to the specified location in the disk partition
