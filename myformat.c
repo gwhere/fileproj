@@ -59,11 +59,10 @@ void main(int argc, char *argv[])
   //DEBUG
   printf("Next inode space = %d\n", find_inode_space(disk, sb,0));
   printf("Next data space = %d\n", find_data_space(disk, sb,0));
-  add_to_root(disk, sb, "abc", 23);
-  add_to_root(disk, sb, "def", 13);
-  add_to_root(disk, sb, "thizz", 12);
-  
-  print_root(disk, sb);
 
+  write_string_file(disk, sb, "thizz", 5, "thizzlam");
+  write_string_file(disk, sb, "hyphy", 5, "whatitdo");
+  print_root(disk,sb);
+  print_file(disk,sb,"thizz");
 }
 

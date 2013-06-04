@@ -82,8 +82,16 @@ void add_to_root(disk_t disk, superblock sb, char * filename, int inode_num);
 
 
 /*
- * Initializes bytemap, which is just an array
- * of inodes in our filesystem.
+ * Looks for a filename in root and returns the 
+ * inode number if found, or -1 if not found.
+ */
+
+int search_root(disk_t disk, superblock sb, char * filename);
+
+
+
+/*
+ * Initializes bytemap
  */
 
 
@@ -112,14 +120,6 @@ void print_bm(disk_t disk, superblock sb);
 int find_inode_space(disk_t disk, superblock sb, int mark);
 
 
-/*
- * Creates an inode struct and returns it. Initialized
- * struct begins with no size or data.
- * Pre: filename is 
- */
-
-myfile create_inode(disk_t disk, superblock sb);
-
 
 
 /*
@@ -144,6 +144,16 @@ int find_data_space(disk_t disk, superblock sb, int mark);
 
 
 /*
- * Write file, handle all bytemap, inodes, and data mapping
+ * Writes 1 block file to disk, whose only data is 
+ * a string given as input
  */
+
+void write_string_file(disk_t disk, superblock sb, char * filename, \
+		       int f_name_size, char * data_string);
+
+/*
+ * Returns the file struct associated with a certain filename
+ */
+
+myfile open_file(disk_t disk, superblock sb, char * filename);
 
