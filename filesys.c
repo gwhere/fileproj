@@ -92,7 +92,20 @@ void add_to_root(disk_t disk, superblock sb, char * fname, int inode_num) {
     writeblock(disk, sb->root_loc, (char *) root);
 }
 
+int search_root(disk_t disk, superblock sb, char * f_name) {
 
+  char databuf[disk->block_size];
+  readblock(disk, sb->root_loc, databuf);
+  dir_entry root = (dir_entry) databuf;
+  int i;
+
+  for(i=0; i<sb->max_files; ++i) {
+    if(strcmp(root[i].filename, f_name) == 0) {
+      return root[i].inode_num;
+    }  
+  }
+  return -1;
+}
 
 void create_bm(disk_t disk, superblock sb) {
   unsigned char bytemap[disk->block_size];
@@ -151,7 +164,10 @@ int find_inode_space(disk_t disk, superblock sb, int mark) {
 
     for(j=0; j < bytes; j++) {
       if(databuf[j]==0) {
-	if(mark>0) databuf[j] = 1;
+	if(mark>0) {
+	  databuf[j] = 1;
+	  writeblock(disk, sb->bm_loc + i, databuf);
+	}
 	return current_block;
       }
       ++current_block;
@@ -177,7 +193,10 @@ int find_data_space(disk_t disk, superblock sb, int mark) {
 
     for(j = bytes-1; j >= 0; --j) {
       if(databuf[j]==0) {
-	if(mark>0) databuf[j]=1;
+	if(mark>0) {
+	  databuf[j]=1;
+	  writeblock(disk, sb->bm_loc + i, databuf);
+	}
 	return current_block;
       }
       --current_block;
@@ -186,4 +205,53 @@ int find_data_space(disk_t disk, superblock sb, int mark) {
   return -1;
 }
 
+
+
+void write_string_file(disk_t disk, superblock sb, char * filename,	\
+		       int f_name_size, char * data_string) {
+
+  if(f_name_size > 16) {
+    printf("Filename is too long");
+    perror("write_string_file");
+  }
+
+  //set up directory entry and mark bytemap
+  int i_num = find_inode_space(disk, sb, 1);
+  add_to_root(disk, sb, filename, i_num);
+  
+  //create file
+  myfile mf = malloc(disk->block_size);
+  mf->f_size = 1;
+  int data_loc = find_data_space(disk, sb, 1);
+  mf->block_list[0] = data_loc;
+
+  writeblock(disk, i_num, (char *)mf);
+  writeblock(disk, data_loc, data_string);
+  free(mf);
+}
+
+myfile open_file(disk_t disk, superblock sb, char * f_name) {
+
+  int i_num = search_root(disk, sb, f_name);
+  char databuf[disk->block_size];
+  readblock(disk, i_num, databuf);
+  myfile mf = (myfile) databuf;
+  return mf;
+
+}
+
+void print_file(disk_t disk, superblock sb, char * f_name) {
+
+  myfile mf = open_file(disk, sb, f_name);
+  int i;
+  char databuf[disk->block_size];
+  for(i=0; i<MAX_F_SIZE; ++i) {
+    if(mf->block_list[i]==0) {
+      break;
+    }
+    readblock(disk, mf->block_list[i], databuf);
+    printf("%s", databuf);
+  }
+  putchar('\n');
+}
 
