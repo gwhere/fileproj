@@ -2,11 +2,10 @@
 #include <stdlib.h>
 #include <unistd.h>
 #include "filesys.h"
+#include "testdisk.h"
 
 
-
-void main(int argc, char *argv[])
-{
+void main(int argc, char *argv[]) {
   char *disk_name;
   disk_t disk;
   unsigned char *databuf;
@@ -60,8 +59,11 @@ void main(int argc, char *argv[])
   printf("Next inode space = %d\n", find_inode_space(disk, sb,0));
   printf("Next data space = %d\n", find_data_space(disk, sb,0));
 
-  write_string_file(disk, sb, "thizz", 5, "thizzlam");
-  write_string_file(disk, sb, "hyphy", 5, "whatitdo");
+  write_string_file(disk, sb, "thizz", "thizzlam");
+  write_string_file(disk, sb, "hyphy", "whatitdo");
+  write_string_file(disk, sb, "kyle", "parent");
+  copy_dir(disk, sb, "test.in"); 
+ 
   print_root(disk,sb);
   print_file(disk,sb,"thizz");
 }
