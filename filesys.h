@@ -149,7 +149,7 @@ int find_data_space(disk_t disk, superblock sb, int mark);
  */
 
 void write_string_file(disk_t disk, superblock sb, char * filename, \
-		       int f_name_size, char * data_string);
+		       char * data_string);
 
 /*
  * Returns the file struct associated with a certain filename

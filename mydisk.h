@@ -1,3 +1,6 @@
+#ifndef __MYDISK_H__
+#define __MYDISK_H__
+
 #include <stdio.h>
 #include <stdlib.h>
 #include <sys/types.h>
@@ -67,4 +70,4 @@ int readblock(disk_t disk, int block, unsigned char *databuf);
 int writeblock(disk_t disk, int block, unsigned char *databuf);
 
 
-
+#endif
