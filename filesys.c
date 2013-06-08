@@ -207,22 +207,6 @@ int find_data_space(disk_t disk, superblock sb, int mark) {
   return -1;
 }
 
-/*void write_file(disk_t disk, superblock sb, char *filename,
-                int f_name_size, char *data_string) {
-  FILE *infile = fopen(filename, "r");
-  if (infile == NULL) {
-    fprintf(stderr, "%s: bad filename.\n", filename);
-  }
-  fseek(infile, 0, SEEK_END);
-  long f_size = ftell(infile);
-  fseek(infile, 0, SEEK_SET);
-  char *line = malloc(sizeof(char) * 84);
-  char *block = malloc(disk->block_size);
-  
-  fgets(line, sizeof(line), infile);
-  
-}*/
-
 void write_string_file(disk_t disk, superblock sb, char * filename,	\
 		       char * data_string) {
  

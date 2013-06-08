@@ -50,5 +50,7 @@ int main (int argc, char **argv) {
   printf("%s: Contents of test.in from disk looks like this:\n",
          argv[0]);
   print_file(disk, sb, "test.in");
+
+  printf("Note: Make sure to \"make clean\" between tests!\n");
   return 0;
 }
