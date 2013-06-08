@@ -1,8 +1,11 @@
-run: sdisk myformat
+all: testdisk formatdisk
+	./testdisk sdisk
+	
+formatdisk: sdisk myformat
 	./myformat sdisk
 
-myformat: myformat.o mydisk.o filesys.o testdisk.o
-	gcc -o myformat myformat.o mydisk.o filesys.o testdisk.o
+myformat: myformat.o mydisk.o filesys.o
+	gcc -o myformat myformat.o mydisk.o filesys.o
 
 myformat.o: myformat.c mydisk.h filesys.h
 	gcc -c myformat.c
@@ -10,13 +13,13 @@ myformat.o: myformat.c mydisk.h filesys.h
 filesys.o: filesys.c filesys.h mydisk.h
 	gcc -c filesys.c
 
-#testdisk: testdisk.o mydisk.o
-#	gcc -o testdisk testdisk.o mydisk.o
+testdisk: testdisk.o mydisk.o filesys.o
+	gcc -o testdisk testdisk.o mydisk.o filesys.o
 
 makedisk: makedisk.o mydisk.o
 	gcc -o makedisk makedisk.o mydisk.o
 
-testdisk.o: testdisk.c mydisk.h testdisk.h
+testdisk.o: testdisk.c mydisk.h
 	gcc -c testdisk.c
 
 makedisk.o: makedisk.c mydisk.h

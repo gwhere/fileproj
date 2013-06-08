@@ -157,3 +157,7 @@ void write_string_file(disk_t disk, superblock sb, char * filename, \
 
 myfile open_file(disk_t disk, superblock sb, char * filename);
 
+/*
+ * Prints the contents of the file system
+ */
+void print_file(disk_t, superblock, char *);
