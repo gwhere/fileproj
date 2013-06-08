@@ -109,6 +109,22 @@ int search_root(disk_t disk, superblock sb, char * f_name) {
   return -1;
 }
 
+
+int getbit(int bit, unsigned char byte) {
+  return ((byte & 1 << bit) > 0);
+}
+
+unsigned char modbit(int bit, unsigned char byte, int val)
+{
+  if (getbit(bit, byte) < (val > 0))
+  	return byte + (byte & (val > 0) << bit);
+  else if (getbit(bit, byte) > (val > 0))
+  	return byte - (byte & (val > 0) << bit);
+  else
+  	return byte;
+}
+
+
 void create_bm(disk_t disk, superblock sb) {
   unsigned char bytemap[disk->block_size];
 
@@ -210,6 +226,7 @@ int find_data_space(disk_t disk, superblock sb, int mark) {
 void write_string_file(disk_t disk, superblock sb, char * filename,	\
 		       char * data_string) {
  
+  int i = 0;
   if(strlen(filename) > 16) {
     fprintf(stderr, "%s: Filename is too long.\n", filename);
     perror("write_string_file");
@@ -221,21 +238,32 @@ void write_string_file(disk_t disk, superblock sb, char * filename,	\
   
   //create file
   myfile mf = malloc(disk->block_size);
-  mf->f_size = 1;
-  int data_loc = find_data_space(disk, sb, 1);
-  mf->block_list[0] = data_loc;
+  mf->f_size = strlen(data_string) / 512;
+  if (strlen(data_string) % 512 != 0) mf->f_size += 1;
+  //printf("file size: %d\n", strlen(data_string));
+  int data_loc;
 
+  for (i = 0; i < mf->f_size - 1; i++)
+  {
+  	data_loc = find_data_space(disk, sb, 1);
+  	mf->block_list[i] = data_loc;
+  	writeblock(disk, data_loc, strndup(data_string + BLOCK_SIZE * i, BLOCK_SIZE));
+  	//printf("file chunk: %d: %s\n", mf->block_list[i], strndup(data_string + BLOCK_SIZE * i, BLOCK_SIZE));
+  }
+  data_loc = find_data_space(disk, sb, 1);
+  mf->block_list[i] = data_loc;
   writeblock(disk, i_num, (char *)mf);
-  writeblock(disk, data_loc, data_string);
+  writeblock(disk, data_loc, data_string + BLOCK_SIZE * i);
+  //printf("file chunk %d: %s\n", mf->block_list[i], data_string + BLOCK_SIZE * i);
   free(mf);
 }
 
 myfile open_file(disk_t disk, superblock sb, char * f_name) {
 
   int i_num = search_root(disk, sb, f_name);
-  char databuf[disk->block_size];
+  unsigned char *databuf = malloc(disk->block_size);
   readblock(disk, i_num, databuf);
-  myfile mf = (myfile) databuf;
+  myfile mf = (myfile)databuf;
   return mf;
 
 }
@@ -244,7 +272,7 @@ void print_file(disk_t disk, superblock sb, char * f_name) {
 
   myfile mf = open_file(disk, sb, f_name);
   int i;
-  char databuf[disk->block_size];
+  unsigned char *databuf = malloc(disk->block_size * mf->f_size);
   for(i=0; i<MAX_F_SIZE; ++i) {
     if(mf->block_list[i]==0) {
       break;
