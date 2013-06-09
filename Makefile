@@ -1,10 +1,7 @@
-all: testdisk formatdisk
-	./testdisk sdisk
-	
 formatdisk: sdisk myformat
 	./myformat sdisk
 
-myformat: myformat.o mydisk.o filesys.o
+myformat: myformat.o mydisk.o filesys.o testdisk
 	gcc -o myformat myformat.o mydisk.o filesys.o
 
 myformat.o: myformat.c mydisk.h filesys.h
