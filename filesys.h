@@ -140,11 +140,15 @@ int write_inode(disk_t disk, superblock sb, myfile f);
 int find_data_space(disk_t disk, superblock sb, int mark);
 
 
+/*
+ * Returns 1 if filename exists, 0 if it doesn't
+ */
 
+int file_exists(disk_t disk, superblock sb, char * filename);
 
 
 /*
- * Writes 1 block file to disk, whose only data is 
+ * Writes file to disk, whose only data is 
  * a string given as input
  */
 
@@ -161,3 +165,11 @@ myfile open_file(disk_t disk, superblock sb, char * filename);
  * Prints the contents of the file system
  */
 void print_file(disk_t, superblock, char *);
+
+/****** Extra Credit ******/
+/*
+ * Deletes file from directory and marks blocks taken by file as empty
+ */
+
+void delete_file(disk_t disk, superblock sb, char * filename);
+

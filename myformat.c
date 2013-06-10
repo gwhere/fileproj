@@ -28,6 +28,9 @@ int main(int argc, char *argv[]) {
 // Cast sb as char* for read/write so mydisk doesn't complain
 
   // Create a new superblock for testing
+  // root should be at block 1 and bitmap
+  // should be at block 2 (allowing it to
+  // expand for a large enough fs)
   sb = create_sb(disk, 20, 1, 2);
   writeblock(disk, 0, (char *)sb);
   free(sb); 
@@ -48,7 +51,7 @@ int main(int argc, char *argv[]) {
     print_root(disk, sb);
 
   //Initialize bitmap
-  create_bm(disk, sb);
+  create_bitm(disk, sb);
 
   return 0;
 }
